@@ -13,9 +13,9 @@ def Decryption (enc_file,dec_file):
         encrypted_data = enc.read()  #a variable containnig  the whole binary text file
 
     with open(dec_file, "w") as dec:  
-        for i in range(0, len(encrypted_data), 8): #each byte is 8 bits so we jump 8 places and using the numbers before as the byte
+        for i in range(0, len(encrypted_data), 8): #loop for each byte
            
-            binary_string = encrypted_data[i:i+8]
+            binary_string = encrypted_data[i:i+8] # taking the 8 next bits
 
             encrypted_byte = int(binary_string, 2)
             
@@ -24,7 +24,6 @@ def Decryption (enc_file,dec_file):
             dec.write (( bin ( decrypted_byte ) ) [2:] .zfill(8))#turning int to binary then removing '0b'
 
             
-
 
 Encryption(r"c:\Users\USER\Downloads\download (1).jpeg",r"c:\Users\USER\Downloads\bits_e.txt")
 
