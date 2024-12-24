@@ -34,5 +34,3 @@ def show (sorted_dic):
             if x<0:
                 break
             print (sorted_dic[i])
-
-common(r"C:\Users\USER\Downloads\hello.txt")
