@@ -1,5 +1,5 @@
 import sys
-def common(file_name):
+def common(file_name,number):
     dic = {}
     try:
         # Open the file in read mode
@@ -16,21 +16,11 @@ def common(file_name):
     
         # Sort the dictionary by word frequency in descending order
         sorted_dic = (sorted(dic.items(), key=lambda x: x[1], reverse=True))
-        
-        show(sorted_dic)
+        #[('hi', 5), ('word', 4)]
+        key_only =[x[0] for x in sorted_dic]
+
+        print (key_only[:number])
 
     except Exception as error:
         print (error)
-
-def show (sorted_dic): 
-        # print the first N common word
-        # when N is provided in sys.argv
-        
-        N=int(sys.argv[1])
-        x=len(sorted_dic)
-        
-        for i in range(N):
-            x-=1
-            if x<0:
-                break
-            print (sorted_dic[i])
+common(r"C:\Users\USER\Downloads\hello.txt",int(sys.argv[1]))
