@@ -1,15 +1,12 @@
 from pathlib import Path
 import requests
 
-
-
 apikey="656fcf35264ae798249564de8477e9fd727078c19eb7ce45ee80a01c35ede2eb" 
 url = "https://www.virustotal.com/api/v3/files" 
 headers = { 
     "accept": "application/json",
     "X-apikey": apikey
 }
-
 
 def traverse_files(folder_path): 
     """
@@ -83,6 +80,7 @@ def is_malicious(file_url):
         print("An error occurred: " + response.json().get("error", {}).get("message", "Unknown error"))
 
 path = r'c:\Users\USER\Documents\tempo'
+
 if traverse_files(path):
     print ("No malicious/suspicious files found in path!")
 else:
