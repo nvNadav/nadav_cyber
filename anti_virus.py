@@ -40,6 +40,8 @@ def scan_file(path):
     Returns True if safe, otherwise False.
     """
     file_url = upload_file(path)
+    if not file_url:
+        return False
     status = is_malicious(file_url)
     return status
 
@@ -48,7 +50,7 @@ def upload_file(path):
     Uploads the file to VirusTotal and returns its unique scan URL.
     """
 
-    file = { "file": (path, open(path, "rb")) } 
+    file = { "file": (path.name, open(path, "rb")) } 
     response  = requests.post(url, files=file, headers=headers)
 
     if (response.status_code==200): 
@@ -58,6 +60,7 @@ def upload_file(path):
     else:
         # API error handling
         print("An error occurred: " + response.json().get("error", {}).get("message", "Unknown error"))
+        return None
 
 def is_malicious(file_url): 
     """
@@ -79,5 +82,8 @@ def is_malicious(file_url):
         # API error handling
         print("An error occurred: " + response.json().get("error", {}).get("message", "Unknown error"))
 
-path = r'c:\Users\USER\Downloads\Sharat.zip'
-#traverse_files(path)
+path = r'c:\Users\USER\Documents\tempo'
+if traverse_files(path):
+    print ("No malicious/suspicious files found in path!")
+else:
+    print ("Found a malicious/suspicious file in Path :(")
