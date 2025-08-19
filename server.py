@@ -17,10 +17,11 @@ files = {}
 # -----------------------------
 def Download(list):
     # list[1] -> file name and type
+    list[1:]=[" ".join(list[1:])]
     try:
         # Check if the file exists in the server dictionary
         if list[1] not in files:
-            return "The file is not in the server... "
+            return "error","The file is not in the server... "
 
         # Full path to the file
         file_path = server_folder.joinpath(Path(list[1]))
@@ -33,9 +34,9 @@ def Download(list):
             encoded_file = base64.b64encode(file).decode()
 
             if encoded_file:
-                return encoded_file
+                return "succes",encoded_file
 
-            return "Could not download this file.."
+            return "error","Could not download this file.."
 
     except Exception as error:
         print(str(error))
@@ -47,6 +48,8 @@ def Download(list):
 def Upload(list):
     # list[2] -> file name and type
     # list[1] -> file content (Base64 encoded)
+    list[2:]=[" ".join(list[2:])] #(incase of a file name with spaces)
+
     try:
         # Check for duplicates
         if list[2] in files:
@@ -72,11 +75,11 @@ def Upload(list):
 
         # Check if the file is readable
         if os.access(full_path, os.R_OK):
-            return f"Successfully Uploaded {list[2]} !"
+            return "succes",f"Successfully Uploaded {list[2]} !"
         else:
             files[old_name] -= 1
             files.pop(list[2])
-            return "An error occurred while uploading, please upload again"
+            return "error","An error occurred while uploading, please upload again"
     except Exception as error:
         print(str(error))
         return str(error)
@@ -84,7 +87,7 @@ def Upload(list):
 # -----------------------------
 # Setup server socket
 # -----------------------------
-serv = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+serv = socket.socket()
 serv.bind(("0.0.0.0", 60123))
 serv.listen(1)
 print("Server is listening...")
@@ -108,12 +111,9 @@ while True:
         # Exit condition
         if list[0] == "EXIT":
             break
-
-        print(list)  # Debug: print received list
-
         # Call the appropriate function and send back the response
         answer = functions[list[0]](list)
-        cli_sock.send(prot.create_msg_with_header(answer).encode())
+        cli_sock.send(prot.create_msg_with_header(answer[0]+" "+answer[1]).encode())
     except Exception as error:
         print(str(error))
         cli_sock.send(prot.create_msg_with_header(str(error)).encode())

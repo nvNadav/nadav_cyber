@@ -7,11 +7,11 @@ from pathlib import Path
 # -----------------------------
 # Setup client socket
 # -----------------------------
-cli = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+cli = socket.socket()
 cli.connect(("127.0.0.1", 60123))
 
 # Example file and client folder paths
-file_send = r"C:\Users\USER\Documents\examples\client_server_2.7.txt"
+file_send = r"C:\Users\USER\Documents\examples\client server_2.7.txt"
 client_folder = Path(r"C:\Users\USER\Documents\py_client")
 
 # -----------------------------
@@ -35,8 +35,11 @@ def Upload(sock):
             # Send message to server
             cli.send(msg.encode())
 
-            # Receive server response
-            return prot.receive_msg(cli)
+            answer = prot.receive_msg(cli).split(" ",1)
+
+            if answer[0]=="error":
+               return answer[1]
+            return answer[1]
     except Exception as error:
         print(str(error))
 
@@ -53,10 +56,12 @@ def Download(sock):
         cli.send(msg.encode())
 
         # Receive the file from server
-        downloaded_file = prot.receive_msg(sock)
+        downloaded_file = prot.receive_msg(sock).split(" ",1)
+        if downloaded_file[0]=="error":
+            return downloaded_file[1]
 
         # Decode Base64 string back to bytes
-        downloaded_file = base64.b64decode(downloaded_file)
+        downloaded_file = base64.b64decode(downloaded_file[1])
 
         # Create full path in client folder
         full_path = client_folder.joinpath(Path(file_name))
@@ -70,6 +75,7 @@ def Download(sock):
             return f"Successfully downloaded {file_name}!"
         else:
             return f"Could not download {file_name}"
+
     except Exception as error:
         return str(error)
 
@@ -82,7 +88,7 @@ functions = {"UPLOAD": Upload, "DOWNLOAD": Download}
 # Main client loop
 # -----------------------------
 while True:
-    try:
+    #try:
         request = input("Upload, Download or Exit? ").upper()
 
         if request == "EXIT":
@@ -96,8 +102,8 @@ while True:
         # Call the appropriate function and print the result
         answer = functions[request](cli)
         print(answer)
-    except Exception as error:
-        print(str(error))
+    #except Exception as error:
+        #print(str(error))
 
 # -----------------------------
 # Close client
