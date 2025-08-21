@@ -1,4 +1,5 @@
-import socket
+import socket,keyboard
+from __pycache__ import prot
 
 def create_socket(ip,port):
     serv = socket.socket()
@@ -9,3 +10,6 @@ def create_socket(ip,port):
     return serv,cli_sock,cli_addr
 
 serv,cli_sock,cli_addr=create_socket("0.0.0.0",60123)
+while True:
+    x=prot.receive_msg(cli_sock)
+    print(x)
