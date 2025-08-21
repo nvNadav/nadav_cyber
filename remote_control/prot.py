@@ -7,18 +7,28 @@ def create_msg_with_header(simple_msg):
     return f'{len(simple_msg):<{HEADERSIZE}}' + simple_msg
 
 # recieve a message starts with a header
-def receive_msg(sock):
-    full_msg = ''
-    new_msg = True
-    while True:
-        #header can be received in multiple chunks
-        msg = sock.recv(BUFFER_RECIEVE)
-        if len(msg) == 0:
-            return None
-        if new_msg:    # first chunk consists of the header and the first part of the msg
-            msglen = int(msg[:HEADERSIZE])
-            new_msg = False
-        full_msg += msg.decode()
+HEADERSIZE = 10
 
-        if len(full_msg) - HEADERSIZE == msglen:
-            return full_msg[HEADERSIZE:]
+def receive_msg(sock):
+    # First, read exactly the header (10 bytes)
+    header = b""
+    while len(header) < HEADERSIZE:
+        chunk = sock.recv(HEADERSIZE - len(header))
+        if not chunk:
+            return None  # connection closed
+        header += chunk
+    
+    try:
+        msglen = int(header.decode().strip())
+    except ValueError:
+        return None  # corrupted header
+    
+    # Now read the full message body
+    data = b""
+    while len(data) < msglen:
+        chunk = sock.recv(msglen - len(data))
+        if not chunk:
+            return None
+        data += chunk
+    
+    return data.decode()
