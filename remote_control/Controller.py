@@ -1,5 +1,5 @@
 import socket,keyboard
-from __pycache__ import prot
+import prot
 
 def create_socket(ip,port):
     serv = socket.socket()
