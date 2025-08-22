@@ -5,7 +5,7 @@ ip="0.0.0.0"
 port=60123
 
 
-def create_socket(ip,port):
+def create_socket(port,*,ip='0.0.0.0',ip_type=socket.AF_INET,protocol_type=socket.SOCK_STREAM):
     serv = socket.socket()
     serv.bind((ip, port))
     serv.listen(1)
@@ -22,7 +22,7 @@ def new_key(event,sock):
         sock.send(prot.create_msg_with_header(event.name).encode())
     
 def keyboard_actions():
-    serv,cli_sock_keyboard,cli_addr=create_socket(ip,port)
+    serv,cli_sock_keyboard,cli_addr=create_socket(port,ip=ip)
 
     keyboard.hook(lambda e: new_key(e, cli_sock_keyboard))
     keyboard.wait('shift+esc')
