@@ -1,15 +1,21 @@
-import socket,keyboard,prot,threading,time,math
+import math
+import socket
+import threading
+import time
+
+import keyboard
 from pynput import mouse
 
-ip="0.0.0.0"
-port=60123
+import prot
 
+keyboard_port = 60123
+mouse_port = 60124
 
 def create_socket(port,*,ip='0.0.0.0',ip_type=socket.AF_INET,protocol_type=socket.SOCK_STREAM):
     serv = socket.socket()
     serv.bind((ip, port))
     serv.listen(1)
-    print ("Server is waiting for connection...")
+    print("Server is waiting for connection...")
     cli_sock, cli_addr = serv.accept()
     print(f"Server is connected with {cli_addr}")
     return serv,cli_sock,cli_addr
@@ -22,15 +28,18 @@ def new_key(event,sock):
         sock.send(prot.create_msg_with_header(event.name).encode())
     
 def keyboard_actions():
-    serv,cli_sock_keyboard,cli_addr=create_socket(port,ip=ip)
+    try:
+        serv,cli_sock_keyboard,cli_addr=create_socket(keyboard_port)
 
-    keyboard.hook(lambda e: new_key(e, cli_sock_keyboard))
-    keyboard.wait('shift+esc')
-    cli_sock_keyboard.send(prot.create_msg_with_header("EXIT").encode())
-
-    cli_sock_keyboard.close()
-    serv.close()
-    print ("Server closed")
+        keyboard.hook(lambda e: new_key(e, cli_sock_keyboard))
+        keyboard.wait('shift+esc')
+        cli_sock_keyboard.send(prot.create_msg_with_header("EXIT").encode())
+    except Exception as error:
+        print (str(error))
+    finally:
+        cli_sock_keyboard.close()
+        serv.close()
+        print ("Server closed")
 
 # -----------------------------
 # mouse section
@@ -88,4 +97,4 @@ def mouse_actions():
 keyboard_thread=threading.Thread(target=keyboard_actions)
 mouse_thread=threading.Thread(target=mouse_actions)
 mouse_thread.start()
-#keyboard_thread.start()
+keyboard_thread.start()

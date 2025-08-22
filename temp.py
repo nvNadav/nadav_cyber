@@ -14,12 +14,12 @@ def on_scroll(x, y, dx, dy):
     print(f'Mouse scrolled at ({x}, {y}) - dx: {dx}, dy: {dy}')
 
 # Start the listener
-print("Starting mouse tracking... Press Ctrl+C to stop")
-with mouse.Listener(
-    on_move=on_move,
-    on_click=on_click,
-    on_scroll=on_scroll) as listener:
-    listener.join()
+# print("Starting mouse tracking... Press Ctrl+C to stop")
+# with mouse.Listener(
+#     on_move=on_move,
+#     on_click=on_click,
+#     on_scroll=on_scroll) as listener:
+#     listener.join()
 
 
 # def new_key(event):
