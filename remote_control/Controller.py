@@ -1,4 +1,4 @@
-import socket,keyboard,prot,threading,time
+import socket,keyboard,prot,threading,time,math
 from pynput import mouse
 
 ip="0.0.0.0"
@@ -36,7 +36,32 @@ def keyboard_actions():
 # mouse section
 # -----------------------------
 
+# Throttling variables
+last_move_time = 0
+last_position = (None, None)
+move_interval = 0.05  # 
+position_threshold = 3  # Only print if moved at least 3 pixels
+
 def on_move(x, y):
+    global last_move_time, last_position
+    
+    current_time = time.time()
+    
+    # Time-based throttling
+    if current_time - last_move_time < move_interval:
+        return
+    
+    # Position-based throttling
+    last_x, last_y = last_position
+    if last_x is not None and last_y is not None:
+        # Calculate distance moved
+        distance = math.sqrt((x - last_x) ** 2 + (y - last_y) ** 2)
+        if distance < position_threshold:
+            return
+    
+    # Update tracking variables
+    last_move_time = current_time
+    last_position = (x, y)
     
     print(f'Mouse moved to ({x}, {y})')
 
