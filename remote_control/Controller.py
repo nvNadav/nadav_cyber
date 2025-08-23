@@ -15,7 +15,7 @@ def create_socket(port,*,ip='0.0.0.0',ip_type=socket.AF_INET,protocol_type=socke
     serv = socket.socket()
     serv.bind((ip, port))
     serv.listen(1)
-    print("Server is waiting for connection...")
+    print(f"Server is waiting for connection in port {port}")
     cli_sock, cli_addr = serv.accept()
     print(f"Server is connected with {cli_addr}")
     return serv,cli_sock,cli_addr
@@ -29,17 +29,17 @@ def new_key(event,sock):
     
 def keyboard_actions():
     try:
-        serv,cli_sock_keyboard,cli_addr=create_socket(keyboard_port)
+        serv,sock_keyboard,cli_addr=create_socket(keyboard_port)
 
-        keyboard.hook(lambda e: new_key(e, cli_sock_keyboard))
+        keyboard.hook(lambda e: new_key(e, sock_keyboard))
         keyboard.wait('shift+esc')
-        cli_sock_keyboard.send(prot.create_msg_with_header("EXIT").encode())
+        sock_keyboard.send(prot.create_msg_with_header("EXIT").encode())
     except Exception as error:
         print (str(error))
     finally:
-        cli_sock_keyboard.close()
+        sock_keyboard.close()
         serv.close()
-        print ("Server closed")
+        print ("keyboard closed...")
 
 # -----------------------------
 # mouse section
@@ -51,7 +51,7 @@ last_position = (None, None)
 move_interval = 0.05  # 
 position_threshold = 3  # Only print if moved at least 3 pixels
 
-def on_move(x, y):
+def on_move(x, y,sock):
     global last_move_time, last_position
     
     current_time = time.time()
@@ -88,13 +88,25 @@ def on_scroll(x, y, dx, dy):
 
 
 def mouse_actions():
-    print("Starting mouse tracking... Press Ctrl+C to stop")
+    try:
+        serv,sock_mouse,cli_addr=create_socket(mouse_port)
+        print("Starting mouse tracking...")
 
-    with mouse.Listener(on_move=on_move,on_click=on_click,on_scroll=on_scroll) as listener: 
-        listener.join()
+        with mouse.Listener(on_move=lambda x,y: on_move(x,y,sock_mouse),
+                            on_click=lambda x,y,button,pressed:on_click(x,y,button,pressed,sock_mouse),
+                            on_scroll=lambda x,y,dx,dy:on_scroll(x,y,dx,dy,sock_mouse)) as listener: 
+            listener.join()
+        sock_mouse.send(prot.create_msg_with_header("EXIT").encode())
+    except Exception as error:
+        print (str(error))
+    finally:
+        sock_mouse.close()
+        serv.close()
+        print ("mouse closed...")
 
 
-keyboard_thread=threading.Thread(target=keyboard_actions)
+
+#keyboard_thread=threading.Thread(target=keyboard_actions)
 mouse_thread=threading.Thread(target=mouse_actions)
 mouse_thread.start()
-keyboard_thread.start()
+#keyboard_thread.start()
