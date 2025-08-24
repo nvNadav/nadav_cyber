@@ -11,9 +11,9 @@ import prot
 keyboard_port = 60123
 mouse_port = 60124
 
-def create_socket(port,*,ip='0.0.0.0',ip_type=socket.AF_INET,protocol_type=socket.SOCK_STREAM):
-    serv = socket.socket()
-    serv.bind((ip, port))
+def create_socket(port,*, host='0.0.0.0', family=socket.AF_INET, sock_type=socket.SOCK_STREAM):
+    serv = socket.socket(family,sock_type)
+    serv.bind((host, port))
     serv.listen(1)
     print(f"Server is waiting for connection in port {port}")
     cli_sock, cli_addr = serv.accept()
@@ -48,8 +48,8 @@ def keyboard_actions():
 # Throttling variables
 last_move_time = 0
 last_position = (None, None)
-move_interval = 0.05  # 
-position_threshold = 3  # Only print if moved at least 3 pixels
+move_interval = 0.05  
+position_threshold = 3  # Only send if moved at least 3 pixels
 
 def on_move(x, y,sock):
     global last_move_time, last_position
@@ -71,20 +71,20 @@ def on_move(x, y,sock):
     # Update tracking variables
     last_move_time = current_time
     last_position = (x, y)
-    
-    print(f'Mouse moved to ({x}, {y})')
 
-def on_click(x, y, button, pressed):
+    # Send the coordinates
+    sock.send(prot.create_msg_with_header(f"MOVE {x} {y}").encode())
+
+def on_click(x, y, button, pressed,sock):
     if pressed:
-        print(f'Mouse clicked at ({x}, {y}) with {button}')
         if button == mouse.Button.middle and x <= 2 and y <= 2:
             return False
+        sock.send(prot.create_msg_with_header(f"PRESS {x} {y} {button}").encode())
     else:
-        print(f'Mouse released at ({x}, {y}) with {button}')
+        sock.send(prot.create_msg_with_header(f"RELEASE {x} {y} {button}").encode())
 
-def on_scroll(x, y, dx, dy):
-    print(f'Mouse scrolled at ({x}, {y}) - dx: {dx}, dy: {dy}')
-
+def on_scroll(x, y, dx, dy,sock):
+    sock.send(prot.create_msg_with_header(f"SCROLL {x} {y} {dx} {dy}").encode())
 
 
 def mouse_actions():
@@ -102,7 +102,7 @@ def mouse_actions():
     finally:
         sock_mouse.close()
         serv.close()
-        print ("mouse closed...")
+        print ("Mouse closed...")
 
 
 
