@@ -79,12 +79,11 @@ def on_click(x, y, button, pressed,sock):
     if pressed:
         if button == mouse.Button.middle and x <= 2 and y <= 2:
             return False
-        sock.send(prot.create_msg_with_header(f"PRESS {button}").encode())
+        sock.send(prot.create_msg_with_header(f"PRESS {button.name}").encode())
     else:
-        sock.send(prot.create_msg_with_header(f"RELEASE {button}").encode())
+        sock.send(prot.create_msg_with_header(f"RELEASE {button.name}").encode())
 
 def on_scroll(x, y, dx, dy,sock):
-    print(f'Mouse scrolled at ({x}, {y}) - dx: {dx}, dy: {dy}')
     sock.send(prot.create_msg_with_header(f"SCROLL {dx} {dy}").encode())
 
 
