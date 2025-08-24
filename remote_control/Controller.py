@@ -29,15 +29,15 @@ def new_key(event,sock):
     
 def keyboard_actions():
     try:
-        serv,sock_keyboard,cli_addr=create_socket(keyboard_port)
+        serv,keyboard_socket,cli_addr=create_socket(keyboard_port)
 
-        keyboard.hook(lambda e: new_key(e, sock_keyboard))
+        keyboard.hook(lambda e: new_key(e, keyboard_socket))
         keyboard.wait('shift+esc')
-        sock_keyboard.send(prot.create_msg_with_header("EXIT").encode())
+        keyboard_socket.send(prot.create_msg_with_header("EXIT").encode())
     except Exception as error:
         print (str(error))
     finally:
-        sock_keyboard.close()
+        keyboard_socket.close()
         serv.close()
         print ("keyboard closed...")
 
@@ -89,24 +89,23 @@ def on_scroll(x, y, dx, dy,sock):
 
 def mouse_actions():
     try:
-        serv,sock_mouse,cli_addr=create_socket(mouse_port)
-        print("Starting mouse tracking...")
+        serv,mouse_socket,cli_addr=create_socket(mouse_port)
 
-        with mouse.Listener(on_move=lambda x,y: on_move(x,y,sock_mouse),
-                            on_click=lambda x,y,button,pressed:on_click(x,y,button,pressed,sock_mouse),
-                            on_scroll=lambda x,y,dx,dy:on_scroll(x,y,dx,dy,sock_mouse)) as listener: 
+        with mouse.Listener(on_move=lambda x,y: on_move(x,y,mouse_socket),
+                            on_click=lambda x,y,button,pressed:on_click(x,y,button,pressed,mouse_socket),
+                            on_scroll=lambda x,y,dx,dy:on_scroll(x,y,dx,dy,mouse_socket)) as listener: 
             listener.join()
-        sock_mouse.send(prot.create_msg_with_header("EXIT").encode())
+        mouse_socket.send(prot.create_msg_with_header("EXIT").encode())
     except Exception as error:
         print (str(error))
     finally:
-        sock_mouse.close()
+        mouse_socket.close()
         serv.close()
         print ("Mouse closed...")
 
 
 
-#keyboard_thread=threading.Thread(target=keyboard_actions)
+keyboard_thread=threading.Thread(target=keyboard_actions)
 mouse_thread=threading.Thread(target=mouse_actions)
 mouse_thread.start()
-#keyboard_thread.start()
+keyboard_thread.start()
