@@ -28,7 +28,7 @@ def new_key(event,sock):
         sock.send(prot.create_msg_with_header(event.name).encode())
     
 def keyboard_actions():
-    try:
+    try:           
         serv,keyboard_socket,cli_addr=create_socket(keyboard_port)
 
         keyboard.hook(lambda e: new_key(e, keyboard_socket))
@@ -39,8 +39,8 @@ def keyboard_actions():
     finally:
         keyboard_socket.close()
         serv.close()
+        keyboard.unhook_all()
         print ("keyboard closed...")
-
 # -----------------------------
 # mouse section
 # -----------------------------
@@ -78,7 +78,7 @@ def on_move(x, y,sock):
 def on_click(x, y, button, pressed,sock):
     if pressed:
         if button == mouse.Button.middle and x <= 2 and y <= 2:
-            return False
+            return False 
         sock.send(prot.create_msg_with_header(f"PRESS {button.name}").encode())
     else:
         sock.send(prot.create_msg_with_header(f"RELEASE {button.name}").encode())
