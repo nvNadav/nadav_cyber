@@ -1,35 +1,17 @@
-import keyboard
-from pynput import mouse
+import cv2, pyautogui
+from PIL import Image
 
-def on_move(x, y):
-    print(f'Mouse moved to ({x}, {y})')
+# img = cv2.imread(r'C:\Users\USER\Desktop\strixsmoke.jpeg', 1)
+# img2 = cv2.imread(r'C:\Users\USER\Desktop\image.png', -1)
+# cv2.imshow("image",img)
+# cv2.waitKey(0)
+# # cv2.imshow("image",img2)
+# # cv2.waitKey(10)
 
-def on_click(x, y, button, pressed):
-    if pressed:
-        print(f'Mouse clicked at ({x}, {y}) with {button}')
-    else:
-        print(f'Mouse released at ({x}, {y}) with {button}')
+screenshot = pyautogui.screenshot()
 
-def on_scroll(x, y, dx, dy):
-    print(f'Mouse scrolled at ({x}, {y}) - dx: {dx}, dy: {dy}')
+screenshot.save(r"C:\Users\USER\Desktop/screenshotimage.png")
 
-# Start the listener
-# print("Starting mouse tracking... Press Ctrl+C to stop")
-# with mouse.Listener(
-#     on_move=on_move,
-#     on_click=on_click,
-#     on_scroll=on_scroll) as listener:
-#     listener.join()
-
-
-# def new_key(event):
-#     if event.event_type == 'down':
-#         print (event.name)
-#         print (type(event.name))
-
-
-# keyboard.hook(callback=new_key)
-
-# keyboard.wait('shift+esc')
-
-# print ("Exiting...")
+img = cv2.imread(r'C:\Users\USER\Desktop/screenshotimage.png', -1)
+cv2.imshow("image",img)
+cv2.waitKey(1000)

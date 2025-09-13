@@ -2,18 +2,29 @@ import math
 import socket
 import threading
 import time
-
+import numpy as np
 import keyboard
+import numpy as np
+import cv2
+
 from pynput import mouse
 
 import prot
 
 keyboard_port = 60123
 mouse_port = 60124
+screen_port = 60125
 
 def create_socket(port,*, host='0.0.0.0', family=socket.AF_INET, sock_type=socket.SOCK_STREAM):
     serv = socket.socket(family,sock_type)
     serv.bind((host, port))
+    if sock_type==socket.SOCK_DGRAM:
+        print(f"Server is waiting for connection in port {port}")
+        data, cli_addr = serv.recvfrom(1024)
+        serv.connect(cli_addr)
+        print(f"Server is connected with {cli_addr}")
+        return serv
+    
     serv.listen(1)
     print(f"Server is waiting for connection in port {port}")
     cli_sock, cli_addr = serv.accept()
@@ -103,9 +114,33 @@ def mouse_actions():
         serv.close()
         print ("Mouse closed...")
 
+# -----------------------------
+# screen section
+# -----------------------------
+def recieve_screenshot():
+    try:
+        screen_socket=create_socket(screen_port,sock_type=socket.SOCK_DGRAM)
+        while True:
+            img_bytes=prot.receive_msg(screen_socket)
+            display_image(img_bytes)
+    except Exception as error:
+        print (str(error))
 
+def display_image(img_bytes):
+    try:
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        cv2.imshow("Received Screenshot", image)
+        cv2.waitKey(100)
+        cv2.destroyAllWindows()
+    except Exception as error:
+        print (str(error))
 
-keyboard_thread=threading.Thread(target=keyboard_actions)
-mouse_thread=threading.Thread(target=mouse_actions)
-mouse_thread.start()
-keyboard_thread.start()
+# keyboard_thread=threading.Thread(target=keyboard_actions)
+# mouse_thread=threading.Thread(target=mouse_actions)
+# mouse_thread.start()
+# keyboard_thread.start()
+
+screen_thread=threading.Thread(target=recieve_screenshot)
+screen_thread.start()
+screen_thread.join()
