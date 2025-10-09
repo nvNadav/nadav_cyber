@@ -6,9 +6,6 @@ BUFFER_RECIEVE = 16
 def create_msg_with_header(simple_msg):
     return f'{len(simple_msg):<{HEADERSIZE}}' + simple_msg
 
-# recieve a message starts with a header
-HEADERSIZE = 10
-
 def receive_msg(sock):
     # First, read exactly the header (10 bytes)
     header = b""
