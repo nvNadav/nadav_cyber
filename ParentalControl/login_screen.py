@@ -26,6 +26,10 @@ class GUI:
         tk.Button(self.root, text="Login", width=10, command=self.login).pack(pady=10)
         tk.Button(self.root, text="Create Account", width=15, command=self.open_signup_window).pack()
 
+        self.signup_username = None
+        self.signup_password = None
+        self.signup_confirm = None
+
 
     def open_signup_window(self):
         signup_window = tk.Toplevel(self.root)
@@ -36,25 +40,27 @@ class GUI:
 
         # Entries
         tk.Label(signup_window, text="Username:",bg="lightblue").pack(pady=5)
-        username_entry = tk.Entry(signup_window, width=25)
-        username_entry.pack()
+        self.signup_username = tk.Entry(signup_window, width=25)
+        self.signup_username.pack()
 
         tk.Label(signup_window, text="Password:",bg="lightblue").pack(pady=5)
-        password_entry = tk.Entry(signup_window, width=25, show="*")
-        password_entry.pack()
+        self.signup_password = tk.Entry(signup_window, width=25, show="*")
+        self.signup_password.pack()
 
         tk.Label(signup_window, text="Confirm Password:",bg="lightblue").pack(pady=5)
-        confirm_entry = tk.Entry(signup_window, width=25, show="*")
-        confirm_entry.pack()
+        self.signup_confirm = tk.Entry(signup_window, width=25, show="*")
+        self.signup_confirm.pack()
 
-        tk.Button(signup_window, text="Sign Up", command=self.login).pack(pady=10)
+        tk.Button(signup_window, text="Sign Up", command=self.create_user).pack(pady=10)
 
-        def create_user(self):
-            username = username_entry.get()
-            password = password_entry.get()
-            confirm = confirm_entry.get()
-            
-            self.db.add_user()
+    def create_user(self):
+        username = self.signup_username.get()
+        password = self.signup_password.get()
+        confirm = self.signup_confirm.get()
+        if password != confirm:
+            messagebox.showerror("Confirmation Error", "Password do not match!")
+        else:
+            self.db.add_user(username,password)
 
 
     def login(self):
