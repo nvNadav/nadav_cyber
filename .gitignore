@@ -2,3 +2,5 @@ school_guess/client.py
 school_guess/server.py
 temp.py
 javaScripts
+users.db
+ParentalControl/__pycache__/UserDatabase.cpython-310.pyc
